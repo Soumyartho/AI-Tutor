@@ -1,0 +1,18 @@
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.1
+sympy==1.13.3
+python-jose[cryptography]==3.3.0
+httpx==0.28.1
+slowapi==0.1.9
+firebase-admin==6.6.0
+instructor==1.7.2
+groq==0.15.0
+# Phase 2 (US-009 clustering). Optional: the app falls back to a hashing embedder
+# + pure-python KMeans if these aren't installed, so they can be added later.
+sentence-transformers==3.3.1
+scikit-learn==1.6.0
+
+# dev/test
+pytest==8.3.4
