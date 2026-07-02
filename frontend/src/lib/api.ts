@@ -28,8 +28,19 @@ async function authHeader(): Promise<Record<string, string>> {
   return { Authorization: `Bearer ${token}` };
 }
 
+// Base URL for the deployed backend (e.g. "https://your-backend.onrender.com").
+// Left empty for local dev, where the Vite dev server proxies /api to
+// localhost:8000 (see vite.config.ts) — relative paths work as-is there.
+// In production (Vercel), the frontend and backend are separate deployments
+// with no proxy, so this MUST be set to the backend's public URL.
+const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL ?? "").replace(/\/$/, "");
+
+function resolve(path: string): string {
+  return `${API_BASE_URL}${path}`;
+}
+
 async function post<T>(path: string, body: unknown): Promise<T> {
-  const res = await fetch(path, {
+  const res = await fetch(resolve(path), {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(await authHeader()) },
     body: JSON.stringify(body),
@@ -38,7 +49,7 @@ async function post<T>(path: string, body: unknown): Promise<T> {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(path, { headers: { ...(await authHeader()) } });
+  const res = await fetch(resolve(path), { headers: { ...(await authHeader()) } });
   return handle<T>(res);
 }
 

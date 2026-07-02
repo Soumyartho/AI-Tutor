@@ -1,0 +1,26 @@
+# Render Blueprint — pre-configures the backend web service so deployment is
+# "connect repo, fill in the one secret, click Apply" instead of manually
+# setting every field in Render's dashboard.
+# Docs: https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: ai-tutor-backend
+    runtime: docker
+    rootDir: backend
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: AUTH_REQUIRED
+        value: "true"
+      - key: FIREBASE_PROJECT_ID
+        value: radixtutor
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: GROQ_API_KEY
+        sync: false # prompted at Blueprint apply time, never committed
+      - key: CORS_ORIGINS
+        value: https://ai-tutor-azure-nine.vercel.app
+      - key: GOOGLE_APPLICATION_CREDENTIALS
+        value: /etc/secrets/firebase-key.json # requires the Secret File added manually (see README)

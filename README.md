@@ -39,6 +39,35 @@ npm run dev                     # http://localhost:5173 (proxies /api → :8000)
 ```
 Build: `npm run build`.
 
+## Deploying (Vercel frontend + separate backend host)
+
+The frontend and backend are **separate deployments** — do not deploy both as
+Vercel "services" in one project. The backend uses a `ProcessPoolExecutor` for
+the solve timeout guard and long-lived Firestore/Groq clients, which don't fit
+Vercel's stateless serverless-function model. Deploy it to **Render, Railway,
+Fly.io, or Cloud Run** instead.
+
+1. **Backend first** — deploy `backend/` (Docker or native Python) to your host
+   of choice. Set its env vars (`.env.example`): `AUTH_REQUIRED=true`,
+   `FIREBASE_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS`, `GROQ_API_KEY`, and
+   `CORS_ORIGINS` — include your Vercel domain once you know it, e.g.
+   `CORS_ORIGINS=https://your-app.vercel.app`. Note the deployed URL.
+
+2. **Frontend on Vercel**:
+   - Import the repo, set **Root Directory** to `frontend` (not the repo root —
+     Vercel should only build the Vite app, not the Python backend).
+   - Framework preset auto-detects as Vite (build `vite build`, output `dist`).
+   - Set environment variables (from `frontend/.env.example`):
+     `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`,
+     `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_APP_ID`, `VITE_DESMOS_API_KEY`,
+     and **`VITE_API_BASE_URL`** = your backend's deployed URL (no trailing
+     slash) from step 1. Without this, API calls resolve to relative `/api/...`
+     paths on the Vercel domain and 404 — there's no backend there to proxy to.
+   - Deploy.
+
+3. If you change the backend URL later, update `VITE_API_BASE_URL` in Vercel's
+   env vars and redeploy the frontend (Vite inlines env vars at build time).
+
 ## Key API
 - `POST /api/solve/equation` `{expression}` → `{input_latex, ast, steps[], solution_latex}`
 - `POST /api/trace/recursion` `{example_id, n}` → `{nodes[], edges[], truncated}`

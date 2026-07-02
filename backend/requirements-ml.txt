@@ -1,0 +1,5 @@
+# Optional Phase 2 (US-009) semantic embeddings — real sentence-transformers
+# instead of the built-in hashing fallback. Pulls in PyTorch (~1-2GB); only
+# install on a host with sufficient build time/disk (not typical free tiers).
+sentence-transformers==3.3.1
+scikit-learn==1.6.0

@@ -9,10 +9,13 @@ slowapi==0.1.9
 firebase-admin==6.6.0
 instructor==1.7.2
 groq==0.15.0
-# Phase 2 (US-009 clustering). Optional: the app falls back to a hashing embedder
-# + pure-python KMeans if these aren't installed, so they can be added later.
-sentence-transformers==3.3.1
-scikit-learn==1.6.0
 
 # dev/test
 pytest==8.3.4
+
+# NOTE: Phase 2 (US-009 clustering) semantic-embedding deps live in
+# requirements-ml.txt, not here. sentence-transformers pulls in PyTorch
+# (~1-2GB) which blows past free-tier build limits on Render/Railway for
+# little benefit — the app falls back to a deterministic hashing embedder +
+# pure-python KMeans automatically when those packages aren't installed.
+# Only install requirements-ml.txt if you have a host that can handle it.
